@@ -1,70 +1,80 @@
 package com.cosmocats.api.service;
 
-import com.cosmocats.api.dto.ProductEntryDto;
-import com.cosmocats.api.dto.ProductUpdateDto;
-import com.cosmocats.api.dto.ProductDto;
 import com.cosmocats.api.domain.Product;
+import com.cosmocats.api.dto.ProductDto;
+import com.cosmocats.api.dto.ProductEntryDto;
 import com.cosmocats.api.web.mapper.ProductMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class ProductServiceImpl implements ProductService {
-
+public class ProductServiceImpl {
+    private final Map<Long, Product> inMemoryDatabase = new ConcurrentHashMap<>();
     private final ProductMapper productMapper;
-    private final Map<Long, Product> inMemoryDatabase = new HashMap<>();
-    private Long productIdSequence = 1L;
+    private long productIdSequence = 1;
 
-    @Autowired
     public ProductServiceImpl(ProductMapper productMapper) {
         this.productMapper = productMapper;
     }
 
-    @Override
-    public ProductDto createProduct(ProductEntryDto productEntryDto) {
-        Product product = productMapper.toProduct(productEntryDto)
-                .toBuilder()
-                .id(productIdSequence++)
-                .build();
-        inMemoryDatabase.put(product.getId(), product);
-        return productMapper.toProductDto(product);
+    public int getInMemoryDatabaseSize() {
+        return inMemoryDatabase.size();
     }
 
-    @Override
+    // Створення продукту
+    public ProductDto createProduct(ProductEntryDto productEntryDto) {
+        Product product = Product.builder()
+                .id(productIdSequence++) // Генерація ID
+                .name(productEntryDto.getName())
+                .description(productEntryDto.getDescription())
+                .price(productEntryDto.getPrice())
+                .category(productEntryDto.getCategory())
+                .build();
+
+        inMemoryDatabase.put(product.getId(), product); // Збереження продукту
+        return productMapper.toProductDto(product); // Перетворення на DTO
+    }
+
+    // Отримання списку продуктів
     public List<ProductDto> getAllProducts() {
         List<Product> products = new ArrayList<>(inMemoryDatabase.values());
-        return productMapper.toProductDtoList(products);
+        return productMapper.toProductDtoList(products); // Перетворення списку на DTO
     }
 
-    @Override
+    // Отримання продукту за ID
     public ProductDto getProductById(Long id) {
         Product product = inMemoryDatabase.get(id);
         if (product == null) {
-            throw new RuntimeException("Product not found with ID: " + id);
+            throw new NoSuchElementException("Product with ID " + id + " not found.");
         }
         return productMapper.toProductDto(product);
     }
 
-    @Override
-    public ProductDto updateProduct(Long id, ProductUpdateDto productUpdateDto) {
+    // Оновлення продукту
+    public ProductDto updateProduct(Long id, ProductEntryDto productEntryDto) {
         Product existingProduct = inMemoryDatabase.get(id);
         if (existingProduct == null) {
-            throw new RuntimeException("Product not found with ID: " + id);
+            throw new NoSuchElementException("Product with ID " + id + " not found.");
         }
-        Product updatedProduct = productMapper.toProduct(productUpdateDto)
-                .toBuilder()
+
+        Product updatedProduct = Product.builder()
                 .id(id)
+                .name(productEntryDto.getName())
+                .description(productEntryDto.getDescription())
+                .price(productEntryDto.getPrice())
+                .category(productEntryDto.getCategory())
                 .build();
+
         inMemoryDatabase.put(id, updatedProduct);
         return productMapper.toProductDto(updatedProduct);
     }
 
-    @Override
+    // Видалення продукту
     public void deleteProduct(Long id) {
         if (!inMemoryDatabase.containsKey(id)) {
-            throw new RuntimeException("Product not found with ID: " + id);
+            throw new NoSuchElementException("Product with ID " + id + " not found.");
         }
         inMemoryDatabase.remove(id);
     }

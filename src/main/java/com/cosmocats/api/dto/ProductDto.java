@@ -7,7 +7,7 @@ import lombok.Value;
 import java.math.BigDecimal;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class ProductDto {
     long id;
     String name;

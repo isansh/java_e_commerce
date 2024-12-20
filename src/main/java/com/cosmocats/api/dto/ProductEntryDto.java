@@ -1,5 +1,6 @@
 package com.cosmocats.api.dto;
 
+import com.cosmocats.api.domain.Product;
 import com.cosmocats.api.dto.validation.CosmicWordCheck;
 import com.cosmocats.api.domain.Category;
 import jakarta.validation.constraints.DecimalMin;
@@ -32,5 +33,9 @@ public class ProductEntryDto {
 
     @NotNull(message = "Category is required.")
     Category category;
+
+    public Product toProduct(Long id) {
+        return new Product(id, name, description, price, category);
+    }
 
 }
