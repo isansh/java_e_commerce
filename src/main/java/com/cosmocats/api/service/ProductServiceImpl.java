@@ -3,6 +3,7 @@ package com.cosmocats.api.service;
 import com.cosmocats.api.domain.Product;
 import com.cosmocats.api.dto.ProductDto;
 import com.cosmocats.api.dto.ProductEntryDto;
+import com.cosmocats.api.dto.ProductUpdateDto;
 import com.cosmocats.api.web.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class ProductServiceImpl {
+public class ProductServiceImpl implements ProductService { // Реалізація інтерфейсу ProductService
     private final Map<Long, Product> inMemoryDatabase = new ConcurrentHashMap<>();
     private final ProductMapper productMapper;
     private long productIdSequence = 1;
@@ -23,7 +24,7 @@ public class ProductServiceImpl {
         return inMemoryDatabase.size();
     }
 
-    // Створення продукту
+    @Override
     public ProductDto createProduct(ProductEntryDto productEntryDto) {
         Product product = Product.builder()
                 .id(productIdSequence++) // Генерація ID
@@ -37,13 +38,13 @@ public class ProductServiceImpl {
         return productMapper.toProductDto(product); // Перетворення на DTO
     }
 
-    // Отримання списку продуктів
+    @Override
     public List<ProductDto> getAllProducts() {
         List<Product> products = new ArrayList<>(inMemoryDatabase.values());
         return productMapper.toProductDtoList(products); // Перетворення списку на DTO
     }
 
-    // Отримання продукту за ID
+    @Override
     public ProductDto getProductById(Long id) {
         Product product = inMemoryDatabase.get(id);
         if (product == null) {
@@ -52,8 +53,8 @@ public class ProductServiceImpl {
         return productMapper.toProductDto(product);
     }
 
-    // Оновлення продукту
-    public ProductDto updateProduct(Long id, ProductEntryDto productEntryDto) {
+    @Override
+    public ProductDto updateProduct(Long id, ProductUpdateDto productUpdateDto) {  // Реалізуйте цей метод
         Product existingProduct = inMemoryDatabase.get(id);
         if (existingProduct == null) {
             throw new NoSuchElementException("Product with ID " + id + " not found.");
@@ -61,17 +62,17 @@ public class ProductServiceImpl {
 
         Product updatedProduct = Product.builder()
                 .id(id)
-                .name(productEntryDto.getName())
-                .description(productEntryDto.getDescription())
-                .price(productEntryDto.getPrice())
-                .category(productEntryDto.getCategory())
+                .name(productUpdateDto.getName()) // Оновлені поля з ProductUpdateDto
+                .description(productUpdateDto.getDescription())
+                .price(productUpdateDto.getPrice())
+                .category(productUpdateDto.getCategory())
                 .build();
 
         inMemoryDatabase.put(id, updatedProduct);
         return productMapper.toProductDto(updatedProduct);
     }
 
-    // Видалення продукту
+    @Override
     public void deleteProduct(Long id) {
         if (!inMemoryDatabase.containsKey(id)) {
             throw new NoSuchElementException("Product with ID " + id + " not found.");

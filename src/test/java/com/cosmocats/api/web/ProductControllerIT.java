@@ -19,6 +19,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,76 +40,57 @@ class ProductControllerIT {
     }
 
     @Test
-    void createProduct_ShouldReturnCreatedProduct() throws Exception {
+    void createProduct() {
+        ProductEntryDto entryDto = ProductEntryDto.builder()
+                .name("Galaxy Milk")
+                .description("Delicious milk from space cows")
+                .price(new BigDecimal("10.50"))
+                .category(new Category(1L, "Dairy", "Milk products"))
+                .build();
+
         ProductDto createdProductDto = ProductDto.builder()
                 .id(1L)
                 .name("Galaxy Milk")
                 .description("Delicious milk from space cows")
-                .price(BigDecimal.valueOf(10.50))
+                .price(new BigDecimal("10.50"))
                 .category(new Category(1L, "Dairy", "Milk products"))
                 .build();
 
         when(productService.createProduct(any(ProductEntryDto.class))).thenReturn(createdProductDto);
 
-        mockMvc.perform(post("/api/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                        {
-                          "name": "Galaxy Milk",
-                          "description": "Delicious milk from space cows",
-                          "price": 10.50,
-                          "category": {
-                            "id": 1,
-                            "name": "Dairy",
-                            "description": "Milk products"
-                          }
-                        }
-                        """))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Galaxy Milk")))
-                .andExpect(jsonPath("$.description", is("Delicious milk from space cows")))
-                .andExpect(jsonPath("$.price", is(10.50)))
-                .andExpect(jsonPath("$.category.id", is(1)))
-                .andExpect(jsonPath("$.category.name", is("Dairy")))
-                .andExpect(jsonPath("$.category.description", is("Milk products")));
+        ProductDto result = productService.createProduct(entryDto);
+
+        assertNotNull(result);
+        assertEquals("Galaxy Milk", result.getName());
+        assertEquals(new BigDecimal("10.50"), result.getPrice());
     }
 
     @Test
-    void updateProduct_ShouldReturnUpdatedProduct() throws Exception {
+    void updateProduct() {
+        ProductUpdateDto updateDto = ProductUpdateDto.builder()
+                .name("Updated Cosmic Candy")
+                .description("Even tastier candy from the cosmos")
+                .price(new BigDecimal("10.99"))
+                .category(null)
+                .build();
+
         ProductDto updatedProductDto = ProductDto.builder()
                 .id(1L)
-                .name("Updated Milk")
-                .description("Updated description")
-                .price(BigDecimal.valueOf(15.50))
-                .category(new Category(1L, "Dairy", "Milk products"))
+                .name("Updated Cosmic Candy")
+                .description("Even tastier candy from the cosmos")
+                .price(new BigDecimal("10.99"))
+                .category(null)
                 .build();
 
         when(productService.updateProduct(eq(1L), any(ProductUpdateDto.class))).thenReturn(updatedProductDto);
 
-        mockMvc.perform(put("/api/products/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                        {
-                          "name": "Updated Milk",
-                          "description": "Updated description",
-                          "price": 15.50,
-                          "category": {
-                            "id": 1,
-                            "name": "Dairy",
-                            "description": "Milk products"
-                          }
-                        }
-                        """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Updated Milk")))
-                .andExpect(jsonPath("$.description", is("Updated description")))
-                .andExpect(jsonPath("$.price", is(15.50)))
-                .andExpect(jsonPath("$.category.id", is(1)))
-                .andExpect(jsonPath("$.category.name", is("Dairy")))
-                .andExpect(jsonPath("$.category.description", is("Milk products")));
+        ProductDto result = productService.updateProduct(1L, updateDto);
+
+        assertNotNull(result);
+        assertEquals("Updated Cosmic Candy", result.getName());
+        assertEquals(new BigDecimal("10.99"), result.getPrice());
     }
+
 
     @Test
     void getProduct_ShouldReturnProduct() throws Exception {

@@ -2,6 +2,7 @@ package com.cosmocats.api.service;
 
 import com.cosmocats.api.dto.ProductDto;
 import com.cosmocats.api.dto.ProductEntryDto;
+import com.cosmocats.api.dto.ProductUpdateDto;
 import com.cosmocats.api.domain.Product;
 import com.cosmocats.api.web.mapper.ProductMapper;
 import com.cosmocats.api.service.ProductServiceImpl;
@@ -107,7 +108,8 @@ class ProductServiceTest {
     void updateProduct() {
         productService.createProduct(testEntryDto);
 
-        ProductEntryDto updatedEntryDto = ProductEntryDto.builder()
+        // Створіть об'єкт ProductUpdateDto, а не ProductEntryDto
+        ProductUpdateDto updatedEntryDto = ProductUpdateDto.builder()
                 .name("Updated Cosmic Candy")
                 .description("Even tastier candy from the cosmos")
                 .price(new BigDecimal("10.99"))
@@ -130,16 +132,17 @@ class ProductServiceTest {
         assertEquals("Updated Cosmic Candy", updatedProduct.getName());
     }
 
+
     @Test
     void updateProductShouldThrowExceptionIfNotFound() {
-        ProductEntryDto updatedEntryDto = ProductEntryDto.builder()
+        ProductUpdateDto updatedUpdateDto = ProductUpdateDto.builder()
                 .name("Updated Cosmic Candy")
                 .description("Even tastier candy from the cosmos")
                 .price(new BigDecimal("10.99"))
                 .category(null)
                 .build();
 
-        assertThrows(NoSuchElementException.class, () -> productService.updateProduct(999L, updatedEntryDto));
+        assertThrows(NoSuchElementException.class, () -> productService.updateProduct(999L, updatedUpdateDto));
     }
 
     @Test
