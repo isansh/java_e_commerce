@@ -6,7 +6,6 @@ import com.cosmocats.api.dto.ProductEntryDto;
 import com.cosmocats.api.dto.ProductDto;
 import com.cosmocats.api.dto.ProductUpdateDto;
 import com.cosmocats.api.service.ProductService;
-import com.cosmocats.api.web.mapper.ProductMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -26,13 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class ProductControllerIT {
 
-
     private MockMvc mockMvc;
-
 
     @Mock
     private ProductService productService;
-
 
     @BeforeEach
     void setUp() {
@@ -41,38 +37,77 @@ class ProductControllerIT {
         mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
     }
 
-
-
     @Test
-    public void createProduct_ShouldReturnCreatedProduct() throws Exception {
-        ProductEntryDto productEntryDto = new ProductEntryDto("Galaxy Comet Milk", "Delicious cosmic milk", new BigDecimal("5.99"), new Category("Dairy"));
+    void createProduct_ShouldReturnCreatedProduct() throws Exception {
+        ProductDto createdProductDto = ProductDto.builder()
+                .id(1L)
+                .name("Galaxy Milk")
+                .description("Delicious milk from space cows")
+                .price(BigDecimal.valueOf(10.50))
+                .category(new Category(1L, "Dairy", "Milk products"))
+                .build();
 
+        when(productService.createProduct(any(ProductEntryDto.class))).thenReturn(createdProductDto);
 
-        mockMvc.perform(post("/products")
+        mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productEntryDto)))
-                .andExpect(status().isCreated()) // expect 201 status
-                .andExpect(jsonPath("$.name").value("Galaxy Comet Milk"))
-                .andExpect(jsonPath("$.price").value(5.99))
-                .andExpect(jsonPath("$.weight").value(2.5));
+                        .content("""
+                        {
+                          "name": "Galaxy Milk",
+                          "description": "Delicious milk from space cows",
+                          "price": 10.50,
+                          "category": {
+                            "id": 1,
+                            "name": "Dairy",
+                            "description": "Milk products"
+                          }
+                        }
+                        """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Galaxy Milk")))
+                .andExpect(jsonPath("$.description", is("Delicious milk from space cows")))
+                .andExpect(jsonPath("$.price", is(10.50)))
+                .andExpect(jsonPath("$.category.id", is(1)))
+                .andExpect(jsonPath("$.category.name", is("Dairy")))
+                .andExpect(jsonPath("$.category.description", is("Milk products")));
     }
 
-
-
     @Test
-    public void updateProduct_ShouldReturnUpdatedProduct() throws Exception {
-        Long productId = 1L;
-        ProductUpdateDto productUpdateDto = new ProductUpdateDto("Starry Moon Updated Milk", "Updated cosmic milk with a new flavor", new BigDecimal("6.99"), new BigDecimal("3.0"));
+    void updateProduct_ShouldReturnUpdatedProduct() throws Exception {
+        ProductDto updatedProductDto = ProductDto.builder()
+                .id(1L)
+                .name("Updated Milk")
+                .description("Updated description")
+                .price(BigDecimal.valueOf(15.50))
+                .category(new Category(1L, "Dairy", "Milk products"))
+                .build();
 
-        mockMvc.perform(put("/products/{id}", productId)
+        when(productService.updateProduct(eq(1L), any(ProductUpdateDto.class))).thenReturn(updatedProductDto);
+
+        mockMvc.perform(put("/api/products/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productUpdateDto)))
-                .andExpect(status().isOk()) // expect 200 status
-                .andExpect(jsonPath("$.name").value("Starry Moon Updated Milk"))
-                .andExpect(jsonPath("$.price").value(6.99))
-                .andExpect(jsonPath("$.weight").value(3.0));
+                        .content("""
+                        {
+                          "name": "Updated Milk",
+                          "description": "Updated description",
+                          "price": 15.50,
+                          "category": {
+                            "id": 1,
+                            "name": "Dairy",
+                            "description": "Milk products"
+                          }
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Updated Milk")))
+                .andExpect(jsonPath("$.description", is("Updated description")))
+                .andExpect(jsonPath("$.price", is(15.50)))
+                .andExpect(jsonPath("$.category.id", is(1)))
+                .andExpect(jsonPath("$.category.name", is("Dairy")))
+                .andExpect(jsonPath("$.category.description", is("Milk products")));
     }
-
 
     @Test
     void getProduct_ShouldReturnProduct() throws Exception {

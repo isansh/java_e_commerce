@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.cosmocats.api.web.ProductControllerIT" tests="4" skipped="0" failures="2" errors="0" timestamp="2024-12-19T11:03:26" hostname="DESKTOP-7K3MJOM" time="3.945">
+<testsuite name="com.cosmocats.api.web.ProductControllerIT" tests="4" skipped="0" failures="2" errors="0" timestamp="2024-12-20T13:40:34" hostname="DESKTOP-7K3MJOM" time="4.268">
   <properties/>
-  <testcase name="createProduct_ShouldReturnCreatedProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="3.685">
+  <testcase name="createProduct_ShouldReturnCreatedProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="4.002">
     <failure message="java.lang.AssertionError: Status expected:&lt;201&gt; but was:&lt;400&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Status expected:&lt;201&gt; but was:&lt;400&gt;
 	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
 	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
@@ -13,8 +13,8 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 </failure>
   </testcase>
-  <testcase name="getAllProducts_ShouldReturnProductList()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.175"/>
-  <testcase name="updateProduct_ShouldReturnUpdatedProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.046">
+  <testcase name="getAllProducts_ShouldReturnProductList()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.176"/>
+  <testcase name="updateProduct_ShouldReturnUpdatedProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.042">
     <failure message="java.lang.AssertionError: Status expected:&lt;200&gt; but was:&lt;400&gt;" type="java.lang.AssertionError">java.lang.AssertionError: Status expected:&lt;200&gt; but was:&lt;400&gt;
 	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
 	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
@@ -26,22 +26,22 @@
 	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
 </failure>
   </testcase>
-  <testcase name="getProduct_ShouldReturnProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.036"/>
-  <system-out><![CDATA[13:03:29.108 [Test worker] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
-13:03:30.133 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
-13:03:30.133 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
-13:03:30.149 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 16 ms
-13:03:30.577 [Test worker] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public com.cosmocats.api.dto.ProductDto com.cosmocats.api.web.ProductController.createProduct(com.cosmocats.api.dto.ProductEntryDto): [Field error in object 'productEntryDto' on field 'name': rejected value [Galaxy Comet Milk]; codes [CosmicWordCheck.productEntryDto.name,CosmicWordCheck.name,CosmicWordCheck.java.lang.String,CosmicWordCheck]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [productEntryDto.name,name]; arguments []; default message [name]]; default message [Product name must include cosmic terms (e.g., 'galaxy', 'comet').]] ]
-13:03:30.618 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
-13:03:30.618 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
-13:03:30.618 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
-13:03:30.800 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
-13:03:30.800 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
-13:03:30.800 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
-13:03:30.827 [Test worker] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [1] in public com.cosmocats.api.dto.ProductDto com.cosmocats.api.web.ProductController.updateProduct(java.lang.Long,com.cosmocats.api.dto.ProductUpdateDto): [Field error in object 'productUpdateDto' on field 'name': rejected value [Starry Updated Milk]; codes [CosmicWordCheck.productUpdateDto.name,CosmicWordCheck.name,CosmicWordCheck.java.lang.String,CosmicWordCheck]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [productUpdateDto.name,name]; arguments []; default message [name]]; default message [Product name must include cosmic terms (e.g., 'star', 'moon').]] ]
-13:03:30.836 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
-13:03:30.836 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
-13:03:30.836 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+  <testcase name="getProduct_ShouldReturnProduct()" classname="com.cosmocats.api.web.ProductControllerIT" time="0.042"/>
+  <system-out><![CDATA[15:40:36.902 [Test worker] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+15:40:38.043 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+15:40:38.043 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+15:40:38.049 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 6 ms
+15:40:38.525 [Test worker] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public com.cosmocats.api.dto.ProductDto com.cosmocats.api.web.ProductController.createProduct(com.cosmocats.api.dto.ProductEntryDto): [Field error in object 'productEntryDto' on field 'name': rejected value [Galaxy Milk]; codes [CosmicWordCheck.productEntryDto.name,CosmicWordCheck.name,CosmicWordCheck.java.lang.String,CosmicWordCheck]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [productEntryDto.name,name]; arguments []; default message [name]]; default message [Product name must include cosmic terms (e.g., 'galaxy', 'comet').]] ]
+15:40:38.572 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+15:40:38.572 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+15:40:38.572 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+15:40:38.755 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+15:40:38.755 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+15:40:38.755 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+15:40:38.771 [Test worker] WARN org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver -- Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [1] in public com.cosmocats.api.dto.ProductDto com.cosmocats.api.web.ProductController.updateProduct(java.lang.Long,com.cosmocats.api.dto.ProductUpdateDto): [Field error in object 'productUpdateDto' on field 'name': rejected value [Updated Milk]; codes [CosmicWordCheck.productUpdateDto.name,CosmicWordCheck.name,CosmicWordCheck.java.lang.String,CosmicWordCheck]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [productUpdateDto.name,name]; arguments []; default message [name]]; default message [Product name must include cosmic terms (e.g., 'star', 'moon').]] ]
+15:40:38.796 [Test worker] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+15:40:38.796 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+15:40:38.796 [Test worker] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
 ]]></system-out>
   <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (C:\Users\Inna2\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.14.19\154da3a65b4f4a909d3e5bdec55d1b2b4cbb6ce1\byte-buddy-agent-1.14.19.jar)
 WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
