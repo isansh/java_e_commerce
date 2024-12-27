@@ -7,41 +7,36 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+
+import org.springframework.http.ProblemDetail;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ProblemDetail> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
+
+        StringBuilder message = new StringBuilder();
+        String objectName = ex.getBindingResult().getObjectName();
 
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-            errors.put(error.getField(), error.getDefaultMessage());
-        }
-
-        String errorMessage = buildErrorMessage(errors, request.getDescription(false));
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Bad Request");
-        response.put("message", errorMessage);
-        response.put("path", request.getDescription(false).replace("uri=", ""));
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    private String buildErrorMessage(Map<String, String> errors, String path) {
-        StringBuilder message = new StringBuilder();
-        for (Map.Entry<String, String> entry : errors.entrySet()) {
             message.append("Field '")
-                    .append(entry.getKey())
+                    .append(error.getField())
                     .append("' ")
-                    .append(entry.getValue())
+                    .append(error.getDefaultMessage())
                     .append(". ");
         }
-        return "Validation failed for object: " + message.toString();
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message.toString());
+        problemDetail.setTitle("Bad Request");
+        problemDetail.setProperty("path", request.getDescription(false).replace("uri=", ""));
+        problemDetail.setProperty("status", HttpStatus.BAD_REQUEST.value());
+
+        return new ResponseEntity<>(problemDetail, HttpStatus.BAD_REQUEST);
     }
 }

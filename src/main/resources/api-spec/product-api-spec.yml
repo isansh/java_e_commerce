@@ -3,7 +3,7 @@ info:
   title: Cosmo Cats Intergalactic Marketplace API
   version: 1.0.0
 paths:
-  /api/products:
+  /api/v1/products:
     get:
       summary: Get all products
       responses:
@@ -20,7 +20,7 @@ paths:
       responses:
         '201':
           description: Product created successfully
-  /api/products/{id}:
+  /api/v1/products:/{id}:
     get:
       summary: Get product by ID
       parameters:

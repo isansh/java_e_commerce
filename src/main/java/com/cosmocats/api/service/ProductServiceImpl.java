@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ProductServiceImpl implements ProductService { // Реалізація інтерфейсу ProductService
-    private final Map<Long, Product> inMemoryDatabase = new ConcurrentHashMap<>();
+    private final Map<UUID, Product> inMemoryDatabase = new ConcurrentHashMap<>();
     private final ProductMapper productMapper;
     private long productIdSequence = 1;
 
@@ -27,7 +27,7 @@ public class ProductServiceImpl implements ProductService { // Реалізац�
     @Override
     public ProductDto createProduct(ProductEntryDto productEntryDto) {
         Product product = Product.builder()
-                .id(productIdSequence++) // Генерація ID
+                .id(UUID.randomUUID()) // Генерація ID
                 .name(productEntryDto.getName())
                 .description(productEntryDto.getDescription())
                 .price(productEntryDto.getPrice())
@@ -45,19 +45,23 @@ public class ProductServiceImpl implements ProductService { // Реалізац�
     }
 
     @Override
-    public ProductDto getProductById(Long id) {
+    public ProductDto getProductById(UUID id) {
         Product product = inMemoryDatabase.get(id);
         if (product == null) {
-            throw new NoSuchElementException("Product with ID " + id + " not found.");
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Product with ID ").append(id).append(" not found.");
+            throw new NoSuchElementException(errorMessage.toString());
         }
         return productMapper.toProductDto(product);
     }
 
     @Override
-    public ProductDto updateProduct(Long id, ProductUpdateDto productUpdateDto) {  // Реалізуйте цей метод
+    public ProductDto updateProduct(UUID id, ProductUpdateDto productUpdateDto) {
         Product existingProduct = inMemoryDatabase.get(id);
         if (existingProduct == null) {
-            throw new NoSuchElementException("Product with ID " + id + " not found.");
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Product with ID ").append(id).append(" not found.");
+            throw new NoSuchElementException(errorMessage.toString());
         }
 
         Product updatedProduct = Product.builder()
@@ -73,9 +77,11 @@ public class ProductServiceImpl implements ProductService { // Реалізац�
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public void deleteProduct(UUID id) {
         if (!inMemoryDatabase.containsKey(id)) {
-            throw new NoSuchElementException("Product with ID " + id + " not found.");
+            StringBuilder errorMessage = new StringBuilder();
+            errorMessage.append("Product with ID ").append(id).append(" not found.");
+            throw new NoSuchElementException(errorMessage.toString());
         }
         inMemoryDatabase.remove(id);
     }

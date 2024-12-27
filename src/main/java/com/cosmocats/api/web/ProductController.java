@@ -10,9 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -30,13 +31,13 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductDto updateProduct(@PathVariable Long id, @Valid @RequestBody ProductUpdateDto productUpdateDto) {
+    public ProductDto updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductUpdateDto productUpdateDto) {
         return productService.updateProduct(id, productUpdateDto);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ProductDto getProduct(@PathVariable Long id) {
+    public ProductDto getProduct(@PathVariable UUID id) {
         return productService.getProductById(id);
     }
 

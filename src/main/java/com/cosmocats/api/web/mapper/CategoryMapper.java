@@ -3,12 +3,12 @@ package com.cosmocats.api.web.mapper;
 import com.cosmocats.api.domain.Category;
 import com.cosmocats.api.dto.CategoryDTO;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")  // Позначаємо маппер як Spring-компонент
 public interface CategoryMapper {
-    CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
+    CategoryDTO categoryToCategoryDto(Category category);
 
     CategoryDTO toDTO(Category category);
+
     Category toEntity(CategoryDTO categoryDTO);
 }

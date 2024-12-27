@@ -8,20 +8,23 @@ import com.cosmocats.api.web.mapper.ProductMapper;
 import com.cosmocats.api.service.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest(classes = {ProductServiceImpl.class})
 class ProductServiceTest {
 
-    @Mock
+    @MockBean
     private ProductMapper productMapper;
 
     @InjectMocks
@@ -33,14 +36,13 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
+        UUID productId = UUID.randomUUID(); // Генерація UUID для продукту
         testProduct = Product.builder()
-                .id(1L)
+                .id(productId)
                 .name("Cosmic Candy")
                 .description("Delicious candy from the cosmos")
                 .price(new BigDecimal("9.99"))
-                .category(null) // Категорія може бути null для тесту
+                .category(null)
                 .build();
 
         testEntryDto = ProductEntryDto.builder()
@@ -51,7 +53,7 @@ class ProductServiceTest {
                 .build();
 
         testProductDto = ProductDto.builder()
-                .id(1L)
+                .id(productId) // Використовуємо UUID
                 .name("Cosmic Candy")
                 .description("Delicious candy from the cosmos")
                 .price(new BigDecimal("9.99"))
@@ -85,30 +87,28 @@ class ProductServiceTest {
 
     @Test
     void getProductById() {
-        System.out.println("In-memory database size: " + productService.getInMemoryDatabaseSize());
         productService.createProduct(testEntryDto);
 
-        // Перевірка кількості продуктів в пам'яті
+
         assertEquals(1, productService.getInMemoryDatabaseSize());
 
-        ProductDto product = productService.getProductById(1L);
+        ProductDto product = productService.getProductById(testProduct.getId());
 
+        // Перевірка на те, чи продукт існує
         assertNotNull(product);
         assertEquals("Cosmic Candy", product.getName());
     }
 
 
-
     @Test
     void getProductByIdShouldThrowExceptionIfNotFound() {
-        assertThrows(NoSuchElementException.class, () -> productService.getProductById(999L));
+        assertThrows(NoSuchElementException.class, () -> productService.getProductById(UUID.randomUUID()));
     }
 
     @Test
     void updateProduct() {
         productService.createProduct(testEntryDto);
 
-        // Створіть об'єкт ProductUpdateDto, а не ProductEntryDto
         ProductUpdateDto updatedEntryDto = ProductUpdateDto.builder()
                 .name("Updated Cosmic Candy")
                 .description("Even tastier candy from the cosmos")
@@ -117,7 +117,7 @@ class ProductServiceTest {
                 .build();
 
         ProductDto updatedProductDto = ProductDto.builder()
-                .id(1L)
+                .id(testProduct.getId()) // Використовуємо UUID
                 .name("Updated Cosmic Candy")
                 .description("Even tastier candy from the cosmos")
                 .price(new BigDecimal("10.99"))
@@ -126,12 +126,11 @@ class ProductServiceTest {
 
         when(productMapper.toProductDto(any(Product.class))).thenReturn(updatedProductDto);
 
-        ProductDto updatedProduct = productService.updateProduct(1L, updatedEntryDto);
+        ProductDto updatedProduct = productService.updateProduct(testProduct.getId(), updatedEntryDto);
 
         assertNotNull(updatedProduct);
         assertEquals("Updated Cosmic Candy", updatedProduct.getName());
     }
-
 
     @Test
     void updateProductShouldThrowExceptionIfNotFound() {
@@ -142,18 +141,18 @@ class ProductServiceTest {
                 .category(null)
                 .build();
 
-        assertThrows(NoSuchElementException.class, () -> productService.updateProduct(999L, updatedUpdateDto));
+        assertThrows(NoSuchElementException.class, () -> productService.updateProduct(UUID.randomUUID(), updatedUpdateDto));
     }
 
     @Test
     void deleteProduct() {
         productService.createProduct(testEntryDto);
 
-        assertDoesNotThrow(() -> productService.deleteProduct(1L));
+        assertDoesNotThrow(() -> productService.deleteProduct(testProduct.getId()));
     }
 
     @Test
     void deleteProductShouldThrowExceptionIfNotFound() {
-        assertThrows(NoSuchElementException.class, () -> productService.deleteProduct(999L));
+        assertThrows(NoSuchElementException.class, () -> productService.deleteProduct(UUID.randomUUID()));
     }
 }

@@ -4,23 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
-@Getter
 public class Product {
-    long id;
+    UUID id;
     String name;
     String description;
     BigDecimal price;
     Category category;
-
-    public Product(long id, String name, String description, BigDecimal price, Category category) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.category = category;
-    }
 }
 

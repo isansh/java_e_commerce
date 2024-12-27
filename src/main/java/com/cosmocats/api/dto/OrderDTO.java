@@ -5,11 +5,12 @@ import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Value
 @Builder
 public class OrderDTO {
-    long id;
+    UUID id;
     List<ProductDto> products;
     LocalDateTime orderDate;
     String customerName;

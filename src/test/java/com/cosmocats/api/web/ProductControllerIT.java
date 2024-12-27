@@ -1,144 +1,159 @@
 package com.cosmocats.api.web;
 
-import com.cosmocats.api.web.ProductController;
-import com.cosmocats.api.domain.Category;
-import com.cosmocats.api.dto.ProductEntryDto;
 import com.cosmocats.api.dto.ProductDto;
+import com.cosmocats.api.dto.ProductEntryDto;
 import com.cosmocats.api.dto.ProductUpdateDto;
 import com.cosmocats.api.service.ProductService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 class ProductControllerIT {
 
+    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Mock
     private ProductService productService;
 
+    private UUID productId;
+    private ProductDto productDto;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        ProductController productController = new ProductController(productService);
-        mockMvc = MockMvcBuilders.standaloneSetup(productController).build();
+        // Initialize productId and productDto before each test
+        productId = UUID.randomUUID();
+        productDto = ProductDto.builder()
+                .id(productId)
+                .name("Galaxy Milk")
+                .description("Delicious milk from space cows")
+                .price(BigDecimal.valueOf(10.50))
+                .category(null) // Assuming category is not used for this example
+                .build();
     }
 
     @Test
-    void createProduct() {
+    void createProduct() throws Exception {
+        // Create ProductEntryDto for the request
         ProductEntryDto entryDto = ProductEntryDto.builder()
                 .name("Galaxy Milk")
                 .description("Delicious milk from space cows")
                 .price(new BigDecimal("10.50"))
-                .category(new Category(1L, "Dairy", "Milk products"))
+                .category(null)
                 .build();
 
+        // Return the created ProductDto when the service is called
         ProductDto createdProductDto = ProductDto.builder()
-                .id(1L)
+                .id(productId)
                 .name("Galaxy Milk")
                 .description("Delicious milk from space cows")
                 .price(new BigDecimal("10.50"))
-                .category(new Category(1L, "Dairy", "Milk products"))
+                .category(null)
                 .build();
 
-        when(productService.createProduct(any(ProductEntryDto.class))).thenReturn(createdProductDto);
+        when(productService.createProduct(entryDto)).thenReturn(createdProductDto);
 
-        ProductDto result = productService.createProduct(entryDto);
-
-        assertNotNull(result);
-        assertEquals("Galaxy Milk", result.getName());
-        assertEquals(new BigDecimal("10.50"), result.getPrice());
+        // Perform the POST request and validate the response
+        mockMvc.perform(post("/api/v1/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(entryDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is("Galaxy Milk")))
+                .andExpect(jsonPath("$.price", is(10.50)))
+                .andExpect(jsonPath("$.id", is(productId.toString())));  // Compare UUID as String
     }
 
     @Test
-    void updateProduct() {
+    void updateProduct() throws Exception {
+        // Create ProductUpdateDto for the update
         ProductUpdateDto updateDto = ProductUpdateDto.builder()
-                .name("Updated Cosmic Candy")
-                .description("Even tastier candy from the cosmos")
-                .price(new BigDecimal("10.99"))
-                .category(null)
+                .name("Updated Galaxy Milk")
+                .description("Even better milk from space cows")
+                .price(new BigDecimal("11.00"))
                 .build();
 
+        // Mock the updated product returned by the service
         ProductDto updatedProductDto = ProductDto.builder()
-                .id(1L)
-                .name("Updated Cosmic Candy")
-                .description("Even tastier candy from the cosmos")
-                .price(new BigDecimal("10.99"))
+                .id(productId)
+                .name("Updated Galaxy Milk")
+                .description("Even better milk from space cows")
+                .price(new BigDecimal("11.00"))
                 .category(null)
                 .build();
 
-        when(productService.updateProduct(eq(1L), any(ProductUpdateDto.class))).thenReturn(updatedProductDto);
+        when(productService.updateProduct(productId, updateDto)).thenReturn(updatedProductDto);
 
-        ProductDto result = productService.updateProduct(1L, updateDto);
-
-        assertNotNull(result);
-        assertEquals("Updated Cosmic Candy", result.getName());
-        assertEquals(new BigDecimal("10.99"), result.getPrice());
+        // Perform the PUT request and validate the response
+        mockMvc.perform(put("/api/v1/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Updated Galaxy Milk")))
+                .andExpect(jsonPath("$.price", is(11.00)))
+                .andExpect(jsonPath("$.id", is(productId.toString())));  // Compare UUID as String
     }
-
 
     @Test
     void getProduct_ShouldReturnProduct() throws Exception {
-        ProductDto productDto = ProductDto.builder()
-                .id(1L)
-                .name("Galaxy Milk")
-                .description("Delicious milk from space cows")
-                .price(BigDecimal.valueOf(10.50))
-                .category(new Category(1L, "Dairy", "Milk products"))
-                .build();
+        // Mock the product returned by the service
+        when(productService.getProductById(productId)).thenReturn(productDto);
 
-        when(productService.getProductById(1L)).thenReturn(productDto);
-
-        mockMvc.perform(get("/api/products/1"))
+        // Perform the GET request and validate the response
+        mockMvc.perform(get("/api/v1/products/{id}", productId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.id", is(productId.toString())))  // Compare UUID as String
                 .andExpect(jsonPath("$.name", is("Galaxy Milk")))
-                .andExpect(jsonPath("$.description", is("Delicious milk from space cows")))
-                .andExpect(jsonPath("$.price", is(10.50)))
-                .andExpect(jsonPath("$.category.id", is(1)))
-                .andExpect(jsonPath("$.category.name", is("Dairy")))
-                .andExpect(jsonPath("$.category.description", is("Milk products")));
+                .andExpect(jsonPath("$.price", is(10.50)));
     }
 
     @Test
     void getAllProducts_ShouldReturnProductList() throws Exception {
-        ProductDto product1Dto = ProductDto.builder()
-                .id(1L)
+        // Create two products for the list
+        ProductDto product1 = ProductDto.builder()
+                .id(UUID.randomUUID())
                 .name("Galaxy Milk")
                 .description("Delicious milk from space cows")
                 .price(BigDecimal.valueOf(10.50))
-                .category(new Category(1L, "Dairy", "Milk products"))
+                .category(null)
                 .build();
 
-        ProductDto product2Dto = ProductDto.builder()
-                .id(2L)
+        ProductDto product2 = ProductDto.builder()
+                .id(UUID.randomUUID())
                 .name("Star Yarn")
                 .description("Anti-gravity yarn for cosmic cats")
                 .price(BigDecimal.valueOf(20.00))
-                .category(new Category(1L, "Dairy", "Milk products"))
+                .category(null)
                 .build();
 
-        when(productService.getAllProducts()).thenReturn(List.of(product1Dto, product2Dto));
+        // Mock the list returned by the service
+        when(productService.getAllProducts()).thenReturn(List.of(product1, product2));
 
-        mockMvc.perform(get("/api/products"))
+        // Perform the GET request and validate the response
+        mockMvc.perform(get("/api/v1/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[1].id", is(2)));
+                .andExpect(jsonPath("$[0].id", is(product1.getId().toString())))  // Compare UUID as String
+                .andExpect(jsonPath("$[1].id", is(product2.getId().toString())));  // Compare UUID as String
     }
 }

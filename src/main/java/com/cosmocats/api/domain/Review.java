@@ -4,11 +4,13 @@ import lombok.Builder;
 import lombok.Value;
 import jakarta.validation.constraints.*;
 
+import java.util.UUID;
+
 @Value
 @Builder(toBuilder = true)
 public class Review {
     @NotNull(message = "Product ID cannot be null")
-    Long productId;
+    UUID productId;
 
     @NotBlank(message = "Reviewer name cannot be blank")
     @Size(max = 50, message = "Reviewer name must not exceed 50 characters")

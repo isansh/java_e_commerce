@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Value;
 
@@ -34,8 +36,15 @@ public class ProductEntryDto {
     @NotNull(message = "Category is required.")
     Category category;
 
-    public Product toProduct(Long id) {
-        return new Product(id, name, description, price, category);
+    public Product toProduct(UUID id) {
+        return Product.builder()
+                .id(id)
+                .name(name)
+                .description(description)
+                .price(price)
+                .category(category)
+                .build();
     }
+
 
 }

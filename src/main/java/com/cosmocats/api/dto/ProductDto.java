@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
 public class ProductDto {
-    long id;
+    UUID id;
     String name;
     String description;
     BigDecimal price;
